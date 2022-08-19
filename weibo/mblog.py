@@ -33,6 +33,7 @@ class Mblog(object):
     def get_tasks(self, file_path):
         csv_file = open(file_path,  encoding='utf-8')
         csv_reader = csv.reader(csv_file)
+        next(csv_reader)
         rows = []
         for row in csv_reader:
           rows.append(row)
@@ -78,6 +79,15 @@ class Mblog(object):
                 self.get_mblog_urls()
 
     # 提取微博
+    def get_long_text(self, mid):
+        url = 'https://m.weibo.cn/statuses/extend?id={0}'.format(mid)
+        try:
+            rsp = requests.get(url=url, headers=self.headers)
+            rsp = json.loads(rsp.text)
+            return rsp['data']['longTextContent']
+        except Exception as e:
+            print('get long text err', e)
+            return ''
     def extract(self, cards):
       rows = []
       for k, card in enumerate(cards):
@@ -85,15 +95,14 @@ class Mblog(object):
           if not card['card_type'] == 9:
             continue
           mblog = card['mblog']
-          txt  = mblog['text']
+          text  = mblog['text']
           # 长微博
-          if mblog['isLongText']:
-              url = 'https://m.weibo.cn/statuses/extend?id={0}'.format(mblog['mid'])
-              rsp = requests.get(url=url, headers=self.headers)
-              rsp = json.loads(rsp.text)
-              txt = rsp['data']['longTextContent']
+          if mblog['isLongText'] == True:
+              longtext = self.get_long_text(mblog['mid'])
+              if not longtext == '':
+                  text = longtext
           # 过滤html
-          text = BeautifulSoup(txt, 'html.parser').get_text()
+          text = BeautifulSoup(text, 'html.parser').get_text()
           row = (self.tag, mblog['mid'], text, mblog['source'], mblog['created_at'])
           # print('row', row)
           rows.append(row)
@@ -137,8 +146,8 @@ class Mblog(object):
             # 开始采集
             self.get_mblog_urls()
             # # 更改任务状态
-            df = pd.read_csv(task_file, header=None)
-            df.iloc[i, 2] = '1'
+            df = pd.read_csv(task_file)
+            df.iloc[i, 2] = 1
             df.to_csv(task_file, index=False)
 
 def main():
@@ -146,7 +155,7 @@ def main():
         # 配置文件
         config = {
             'max_page': 30,  # 最大采集页数
-            'task_file': 'mblog.csv' #任务列表（3列： uid, 自定义tag,状态）
+            'task_file': 'list.csv' #任务列表（3列： uid, 自定义tag,状态）
         }
         spider = Mblog(config)
         spider.start()
