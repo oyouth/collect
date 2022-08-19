@@ -6,6 +6,10 @@
 ```
 /weibo/mblog.py
 ```
+安装脚本所依赖的python模块
+```
+pip install -r requirements.txt
+```
 #### 任务列表
 文件`mblog.csv`
 |uid|tag|status|
