@@ -1,5 +1,7 @@
 # 采集脚本
 
+树洞开源行动：https://github.com/oyouth/shudong
+
 ## 微博
 ### 1.用户微博采集
 通过微博`uid`，批量采集用户的所发布的微博（仅采集card_type=9类型）。
