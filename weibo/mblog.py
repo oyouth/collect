@@ -42,7 +42,7 @@ class Mblog(object):
     # 接口解析
     def get_mblog_urls(self):
         # 接口地址
-        delay = random.uniform(1.5, 3.5)
+        delay = random.uniform(1.5, 2.5)
         time.sleep(delay)
         url = 'https://m.weibo.cn/api/container/getIndex?type=uid&value={0}&containerid=107603{0}&page={1}'.format(str(self.uid), str(self.page))
         print('api', url)
@@ -78,20 +78,23 @@ class Mblog(object):
                 print('[page/total]',  self.page, self.page_number)
                 self.get_mblog_urls()
 
-    # 提取微博
+    # 长微博
     def get_long_text(self, mid):
         url = 'https://m.weibo.cn/statuses/extend?id={0}'.format(mid)
         try:
             rsp = requests.get(url=url, headers=self.headers)
             rsp = json.loads(rsp.text)
-            return rsp['data']['longTextContent']
+            text = rsp['data']['longTextContent']
+            return text
         except Exception as e:
             print('get long text err', e)
             return ''
+
+    # 提取微博        
     def extract(self, cards):
       rows = []
       for k, card in enumerate(cards):
-          print('[card].{0} , card_type: {1}, {2}'.format(k+1, card['card_type'], 0))
+          print('card-{0} , card_type: {1}, {2}'.format(k+1, card['card_type'], 0))
           if not card['card_type'] == 9:
             continue
           mblog = card['mblog']
@@ -136,7 +139,7 @@ class Mblog(object):
               print('[pass]', i)
               continue
             # 切换用户停顿
-            delay = random.uniform(10.5, 30.5)
+            delay = random.uniform(2.5, 10.5)
             time.sleep(delay)
             # 初始化基本参数
             self.page = 1
@@ -151,16 +154,13 @@ class Mblog(object):
             df.to_csv(task_file, index=False)
 
 def main():
-    try:
-        # 配置文件
-        config = {
-            'max_page': 30,  # 最大采集页数
-            'task_file': 'list.csv' #任务列表（3列： uid, 自定义tag,状态）
-        }
-        spider = Mblog(config)
-        spider.start()
-    except Exception as err:
-        print(err)
+    # 配置文件
+    config = {
+        'max_page': 30,  # 最大采集页数
+        'task_file': 'list.csv' #任务列表（3列： uid, 自定义tag,状态）
+    }
+    spider = Mblog(config)
+    spider.start()
 
 if __name__ == "__main__":
     main()
