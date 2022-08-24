@@ -3,8 +3,6 @@
 树洞开源行动：https://github.com/oyouth/shudong
 
 ## 微博
-### 1.用户微博采集
-通过微博`uid`，批量采集用户的所发布的微博（仅采集card_type=9类型）。
 ```
 git clone https://github.com/oyouth/collect.git
 ```
@@ -15,6 +13,9 @@ cd weibo
 ```
 pip install -r requirements.txt
 ```
+### 1.用户微博采集
+通过微博`uid`，批量采集用户的所发布的微博（仅采集card_type=9类型）。
+
 #### 任务列表
 文件`mblog.csv`，示例：
 |uid|tag|status|
@@ -41,6 +42,25 @@ python mblog.py
 ```
 
 ### 2.微博超话采集
+通过微博话题id，批量采集超话帖子（可单独设置页数限制）。
+
+#### 任务列表
+文件`topics.csv`，示例：
+|id|name|limit|status|
+|---|---|---|---|
+|10080807930c974401ee7d0d242aed3c6d19ca|抑郁超话|2|0|
+|100808e056951c0679ee95c6eb872a589c0744|抑郁症患者超话|2|0||
+
+其中`name`用作采集微博数据保存文件名。`limit`为采集该超话的最大页数，状态`status`的值：`0`表示未采集；`1`表示已采集，下次运行将会跳过。
+
+#### 运行
+```
+python topic.py
+```
+#### 保存
+默认保存于`topics`目录下，每个name对应一个csv文件，如：
+```
+./topics/抑郁超话.csv
 ```
 
-```
+
